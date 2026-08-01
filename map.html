@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Civic Tech Corps · Recruiting pipeline</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{--bg:#eef1f5;--panel:#ffffff;--line:#e4e7ec;--txt:#1f2937;--dim:#6b7280;
+    --accent:#111827;--hover:#f3f4f6;--tip:#111827;
+    --hbcu:#db2777;--elite:#4f46e5;--comm:#0d9488;--cand:#d97706;--field:#9aa6b8}
+  body.dark{--bg:#0b1020;--panel:#151c30;--line:#28324c;--txt:#dce4f2;--dim:#8a99b5;
+    --accent:#3b82f6;--hover:rgba(255,255,255,.06);--tip:#1f2942;--field:#5b6678}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  #map{position:absolute;inset:0;background:var(--bg)}
+  .leaflet-container{background:var(--bg);font-family:inherit}
+  .leaflet-interactive:focus{outline:none}
+  .panel{position:absolute;z-index:1000;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.1),0 6px 16px rgba(16,24,40,.1)}
+  #title{top:14px;left:50%;transform:translateX(-50%);padding:8px 18px;text-align:center;max-width:min(92vw,540px)}
+  #title b{font-size:14px;color:var(--txt)}#title div{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.4}
+  #ctrl{top:14px;left:14px;padding:13px 14px;width:238px;font-size:12px;max-height:calc(100vh - 28px);overflow-y:auto}
+  h4{margin:0 0 6px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.1px;font-weight:600}
+  .lyr{display:flex;align-items:center;gap:8px;margin:2px 0;cursor:pointer;padding:3px 4px;border-radius:6px}
+  .lyr:hover{background:var(--hover)}.lyr input{accent-color:var(--accent)}
+  .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .barc{width:16px;height:0;border-top:2px dashed var(--cand);flex:0 0 auto}
+  .lyr .nm{flex:1 1 auto;min-width:0}
+  .lyr .n{color:var(--dim);font-variant-numeric:tabular-nums;font-size:11px;flex:0 0 auto}
+  .legmod{font-size:9px;color:var(--dim);margin:6px 0 2px;text-transform:uppercase;letter-spacing:1px}
+  hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+  .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .segbtn{flex:1;cursor:pointer;border:0;background:var(--panel);color:var(--txt);padding:7px 0;font-size:11px;font-weight:500;font-family:inherit}
+  .segbtn+.segbtn{border-left:1px solid var(--line)}
+  .segbtn:hover{background:var(--hover)}.segbtn.on{background:var(--accent);color:#fff}
+  .sub{color:var(--dim);font-size:10px;line-height:1.45;margin-top:7px}
+  #cand{bottom:16px;right:14px;width:232px;padding:11px 13px;font-size:12px}
+  #cand h4{margin-bottom:5px}
+  .crow{display:flex;align-items:center;gap:8px;padding:6px 5px;border-radius:6px;cursor:pointer}
+  .crow:hover{background:var(--hover)}
+  .crow .cd{width:9px;height:9px;border-radius:50%;background:var(--cand);flex:0 0 auto;box-shadow:0 0 0 3px rgba(217,119,6,.18)}
+  .crow .cn{flex:1;font-weight:600}.crow .cs{color:var(--dim);font-size:11px}
+  #legend{bottom:16px;left:14px;padding:10px 13px;font-size:11px}
+  .leg{display:flex;align-items:center;gap:7px;margin:3px 0;color:var(--txt)}
+  .leg .sw{width:12px;height:12px;border-radius:50%}
+  .hint{color:var(--dim);font-size:10px;margin-top:8px;line-height:1.45}
+  .leaflet-popup-content-wrapper{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+  .leaflet-popup-tip{background:var(--panel);border:1px solid var(--line)}
+  .leaflet-popup-content{margin:12px 14px;font-size:12px;color:var(--txt);overflow-wrap:anywhere}
+  .leaflet-popup-close-button{color:var(--dim)!important}
+  .leaflet-tooltip{background:var(--tip);color:#fff;border:0;border-radius:6px;font-size:11px;padding:3px 7px;font-weight:500;box-shadow:none}
+  .leaflet-bar a{background:var(--panel);color:var(--txt);border-color:var(--line)}
+  .leaflet-control-attribution{background:rgba(255,255,255,.78)!important;color:#6b7280!important;font-size:9px}
+  body.dark .leaflet-control-attribution{background:rgba(11,16,32,.8)!important;color:#8a99b5!important}
+  /* flowing recruiting arcs */
+  .arc{stroke-dasharray:5 9;animation:flow 1s linear infinite}
+  .arc.elite{stroke-dasharray:2 8;animation-duration:1.4s}
+  @keyframes flow{to{stroke-dashoffset:-14}}
+  @media(prefers-reduced-motion:reduce){.arc{animation:none;stroke-dasharray:none}}
+  /* candidate popup */
+  .pp .h{font-weight:700;font-size:14px}.pp .loc{color:var(--dim);font-size:11px;margin:1px 0 9px}
+  .pp .chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;
+    background:var(--hover);border:1px solid var(--line);color:var(--txt);letter-spacing:.2px}
+  .pp .fig{margin:2px 0 9px}.pp .fig b{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--cand)}
+  .pp .fig span{color:var(--dim);font-size:11px;margin-left:8px}
+  .pp .kv{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;margin:5px 0;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .pp .kv .k{color:var(--dim)}.pp .kv .v{text-align:right;font-weight:600}.pp .est{color:var(--dim);font-weight:400;font-size:10px}
+  .pp .race{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0 5px}.pp .race span{display:block;height:100%}
+  .pp .rl{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--dim)}.pp .rl i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:-1px}
+  .pp .feeds{font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .pp .ctx{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .pp .why{font-size:11.5px;margin-top:9px;line-height:1.5;padding:8px 10px;background:var(--hover);border-radius:8px;border-left:2px solid var(--cand)}
+  body.embed #title{display:none}
+  @media(max-width:660px){#cand{display:none}}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="title" class="panel"><b>Tapping the pipeline</b>
+  <div>Civic Tech Corps recruits technical talent from HBCUs and top schools, then channels it into the communities the field overlooks.</div></div>
+
+<div id="ctrl" class="panel">
+  <h4>View</h4>
+  <div class="seg"><button class="segbtn on" id="vPipe">Our pipeline</button><button class="segbtn" id="vFel">Existing fellowships</button></div>
+  <hr>
+  <div id="pipeBlock">
+    <h4>The pipeline</h4>
+    <label class="lyr"><input type="checkbox" checked data-k="arcs"><span class="barc"></span><span class="nm">Recruiting connections</span></label>
+    <label class="lyr"><input type="checkbox" checked data-k="candidate"><span class="dot" style="background:var(--cand)"></span><span class="nm">Candidate communities</span></label>
+    <label class="lyr"><input type="checkbox" checked data-k="hbcu"><span class="dot" style="background:var(--hbcu)"></span><span class="nm">HBCUs (technical degrees)</span></label>
+    <label class="lyr"><input type="checkbox" checked data-k="elite"><span class="dot" style="background:var(--elite)"></span><span class="nm">Target recruiting schools</span></label>
+    <label class="lyr"><input type="checkbox" checked data-k="community"><span class="dot" style="background:var(--comm)"></span><span class="nm">Council-manager communities</span></label>
+    <hr>
+    <h4>For comparison</h4>
+    <label class="lyr"><input type="checkbox" checked data-k="placements"><span class="dot" style="background:var(--field)"></span><span class="nm">Where fellowships go today</span></label>
+    <div class="sub">The faint dots are 1,130 existing placements from six national fellowships. Notice how few reach the communities we target.</div>
+  </div>
+  <div id="felBlock" style="display:none">
+    <h4>Fellowships</h4>
+    <div id="felToggles"></div>
+    <div class="sub">Every placement from the six national fellowships, colored by program and sized by fellows. Click a dot to see who was placed there. Candidate communities stay marked in gold for comparison.</div>
+  </div>
+  <hr>
+  <h4>Map theme</h4>
+  <div class="seg"><button class="segbtn on" id="tLight">Light</button><button class="segbtn" id="tDark">Dark</button></div>
+</div>
+
+<div id="cand" class="panel">
+  <h4>Five Southern cases</h4>
+  <div id="candlist"></div>
+</div>
+
+<div id="legend" class="panel"></div>
+
+<script src="network_data.js"></script>
+<script>
+(function(){
+  const N=window.NET||{placements:[],hbcu:[],elite:[],community:[],candidate:[],arcs:[]};
+  const COL={hbcu:'#db2777',elite:'#4f46e5',community:'#0d9488',candidate:'#d97706',field:'#9aa6b8'};
+  const RACECOL={Black:'#0d9488',White:'#94a3b8',Hispanic:'#d97706',Asian:'#7c3aed'};
+  const esc=s=>(''+s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'k':''+n;
+
+  const US=[[8,-135],[54,-58]];
+  const tileL='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  const tileD='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  const map=L.map('map',{zoomControl:false,minZoom:4,maxZoom:12,maxBounds:US,maxBoundsViscosity:.3});
+  map.fitBounds([[25.5,-124],[48.5,-67]],{padding:[8,8]});
+  L.control.zoom({position:'topright'}).addTo(map);
+  let tile=L.tileLayer(tileL,{subdomains:'abcd',minZoom:4,maxZoom:12,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+
+  const groups={placements:L.layerGroup(),arcs:L.layerGroup(),community:L.layerGroup(),
+                hbcu:L.layerGroup(),elite:L.layerGroup(),candidate:L.layerGroup()};
+
+  // fellowship placements (faint field backdrop)
+  N.placements.forEach(p=>{
+    L.circleMarker([p[0],p[1]],{radius:2+Math.min(4,Math.sqrt(p[2])/2.4),stroke:false,
+      fill:true,fillColor:COL.field,fillOpacity:.5}).addTo(groups.placements);
+  });
+
+  // recruiting arcs (school -> community), curved + flowing
+  function arc(a,b,k){
+    const dLat=b[0]-a[0], dLon=b[1]-a[1], dist=Math.hypot(dLat,dLon)||1;
+    let pl=-dLon/dist, po=dLat/dist;            // perpendicular (lat,lon)
+    if(pl<0){ pl=-pl; po=-po; }                  // bow north
+    const off=dist*k, c=[(a[0]+b[0])/2+pl*off, (a[1]+b[1])/2+po*off];
+    const pts=[]; for(let i=0;i<=28;i++){ const t=i/28, u=1-t;
+      pts.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0], u*u*a[1]+2*u*t*c[1]+t*t*b[1]]); }
+    return pts;
+  }
+  N.arcs.forEach(A=>{
+    L.polyline(arc(A.a,A.b,0.16),{color:COL[A.t],weight:A.t==='hbcu'?1.9:1.4,
+      opacity:A.t==='hbcu'?.55:.4,className:'arc '+A.t}).addTo(groups.arcs);
+  });
+
+  // council-manager communities
+  N.community.forEach(c=>{
+    L.circleMarker([c.lat,c.lon],{radius:3+Math.sqrt(c.pop)/62,color:COL.community,weight:1,
+      fill:true,fillColor:COL.community,fillOpacity:.5})
+      .bindTooltip(`${c.name}, ${c.state} · ${c.pop.toLocaleString()}`)
+      .bindPopup(`<div><b style="font-size:13px">${esc(c.name)}, ${esc(c.state)}</b>
+        <div style="color:var(--dim);font-size:11px;margin-top:2px">Council-manager government · pop. ${c.pop.toLocaleString()}</div></div>`).addTo(groups.community);
+  });
+  // schools
+  N.hbcu.forEach(u=>{
+    L.circleMarker([u.lat,u.lon],{radius:5.5,color:'#fff',weight:1.5,fill:true,fillColor:COL.hbcu,fillOpacity:.95})
+      .bindTooltip(u.name)
+      .bindPopup(`<div style="max-width:240px"><b style="font-size:13px">${esc(u.name)}</b>
+        <div style="color:var(--dim);font-size:11px;margin:1px 0 6px">HBCU · ${esc(u.city)}, ${esc(u.state)}</div>
+        <div style="font-size:11.5px">${esc(u.prog)}</div></div>`).addTo(groups.hbcu);
+  });
+  N.elite.forEach(u=>{
+    L.circleMarker([u.lat,u.lon],{radius:5,color:'#fff',weight:1.5,fill:true,fillColor:COL.elite,fillOpacity:.95})
+      .bindTooltip(u.name)
+      .bindPopup(`<div><b style="font-size:13px">${esc(u.name)}</b>
+        <div style="color:var(--dim);font-size:11px">Target recruiting · ${esc(u.city)}, ${esc(u.state)}</div></div>`).addTo(groups.elite);
+  });
+
+  // feeder-school labels per candidate (from arcs)
+  const feeders={};
+  N.arcs.forEach(A=>{ (feeders[A.c]=feeders[A.c]||[]).push(A.s); });
+  function candPopup(c){
+    const fd=(feeders[c.name]||[]).map(esc).join(', ');
+    return `<div class="pp" style="max-width:290px">
+      <div class="h">${esc(c.label||c.name)}</div>
+      <div class="loc"><span class="chip">${esc(c.kind)}</span></div>
+      <div class="fig"><b>${esc(c.figure)}</b><span>${esc(c.figure_note)}</span></div>
+      <div class="kv"><span class="k">Population</span><span class="v">${c.pop.toLocaleString()}</span></div>
+      <div class="kv"><span class="k">Who it hit</span><span class="v">${esc(c.black)}</span></div>
+      <div class="ctx">${esc(c.headline)}</div>
+      <div class="why">${esc(c.takeaway)}</div>
+      <div class="feeds"><b style="color:var(--txt)">Recruit from:</b> ${fd}</div>
+    </div>`;
+  }
+  const candMarkers={};
+  N.candidate.forEach(c=>{
+    const m=L.circleMarker([c.lat,c.lon],{radius:9,color:'#fff',weight:2,fill:true,fillColor:COL.candidate,fillOpacity:.98})
+      .bindTooltip(`${esc(c.label||c.name)}`)
+      .bindPopup(candPopup(c),{maxWidth:300,maxHeight:Math.round(innerHeight*0.72),
+        autoPanPaddingTopLeft:[24,96],autoPanPaddingBottomRight:[24,28]});
+    m.addTo(groups.candidate); candMarkers[c.name]=m;
+  });
+
+  // ---- existing fellowships: granular per-program detail view ----
+  const sources=N.sources||[], colors=N.colors||[], model=N.model||{};
+  const felGroups=sources.map(()=>L.layerGroup());
+  const felActive=new Set(sources.map((_,i)=>i));
+  const felR=n=>Math.min(16,3+2.2*Math.sqrt(n)), felCount=sources.map(()=>0);
+  let MODE='pipe';
+  function felPopup(p){
+    const rows=p.f.slice(0,80).map(f=>{const meta=[f[1],f[2]].filter(Boolean).join(' · ');
+      return `<div style="margin:2px 0"><b>${esc(f[0])}</b><br><span style="color:var(--dim);font-size:11px">${esc(meta)}</span></div>`;}).join('');
+    return `<div style="max-width:280px;overflow-wrap:anywhere"><b style="font-size:13px">${esc(p.label)}</b>
+      <div style="color:${colors[p.s]};font-size:11px;margin:1px 0 5px">${esc(sources[p.s])} · ${p.f.length} fellow(s)</div>
+      <div style="max-height:min(44vh,240px);overflow-y:auto;padding-right:4px">${rows}</div></div>`;
+  }
+  (N.fellows||[]).forEach(p=>{ felCount[p.s]+=p.f.length;
+    L.circleMarker([p.lat,p.lon],{radius:felR(p.f.length),color:'#fff',weight:1,fill:true,fillColor:colors[p.s],fillOpacity:.82})
+      .bindTooltip(`${p.label} · ${p.f.length} ${sources[p.s]}`)
+      .bindPopup(felPopup(p),{maxWidth:300,maxHeight:Math.round(innerHeight*0.7),autoPanPaddingTopLeft:[24,96],autoPanPaddingBottomRight:[24,28]})
+      .addTo(felGroups[p.s]);
+  });
+  (function(){const bm={}; sources.forEach((s,i)=>{(bm[model[s]]=bm[model[s]]||[]).push(i);});
+    let h=''; for(const mod in bm){ h+=`<div class="legmod">${mod}</div>`;
+      bm[mod].forEach(i=>{h+=`<label class="lyr"><input type="checkbox" checked data-fs="${i}"><span class="dot" style="background:${colors[i]}"></span><span class="nm">${esc(sources[i])}</span><span class="n">${felCount[i]}</span></label>`;});}
+    document.getElementById('felToggles').innerHTML=h;
+    document.querySelectorAll('#felToggles input[data-fs]').forEach(inp=>inp.addEventListener('change',e=>{
+      const i=+e.target.dataset.fs;
+      if(e.target.checked){felActive.add(i); if(MODE==='fel') felGroups[i].addTo(map);}
+      else{felActive.delete(i); map.removeLayer(felGroups[i]);}}));
+  })();
+
+  function updateLegend(fel){
+    let h;
+    if(fel){
+      h=sources.map((s,i)=>`<div class="leg"><span class="sw" style="background:${colors[i]}"></span>${esc(s)}</div>`).join('')
+       +`<div class="leg"><span class="sw" style="background:${COL.candidate}"></span>Featured community</div>`
+       +`<div class="hint">Dot size = fellows placed there. Click a dot for their names. Toggle programs at left.</div>`;
+    }else{
+      h=[['candidate','Candidate community'],['community','Council-manager community'],['hbcu','HBCU with technical degrees'],['elite','Target recruiting school'],['field','Existing fellowship placement']]
+        .map(([k,l])=>`<div class="leg"><span class="sw" style="background:${COL[k]}"></span>${l}</div>`).join('')
+       +`<div class="leg"><span class="barc" style="width:14px;border-top-color:var(--cand)"></span>Recruiting connection</div>`
+       +`<div class="hint">Flowing lines show talent recruited into each community. Click a candidate for the full profile.</div>`;
+    }
+    document.getElementById('legend').innerHTML=h;
+  }
+
+  // ---- mode switch ----
+  const pipeKeys=['placements','arcs','community','hbcu','elite'];
+  ['placements','arcs','community','hbcu','elite','candidate'].forEach(k=>groups[k].addTo(map));
+  document.querySelectorAll('#pipeBlock input[data-k]').forEach(inp=>inp.addEventListener('change',e=>{
+    const k=e.target.dataset.k; e.target.checked?groups[k].addTo(map):map.removeLayer(groups[k]);}));
+  function setMode(m){
+    MODE=m; const fel=(m==='fel');
+    document.getElementById('pipeBlock').style.display=fel?'none':'';
+    document.getElementById('felBlock').style.display=fel?'':'none';
+    document.getElementById('vFel').classList.toggle('on',fel);
+    document.getElementById('vPipe').classList.toggle('on',!fel);
+    pipeKeys.forEach(k=>map.removeLayer(groups[k]));
+    felGroups.forEach(g=>map.removeLayer(g));
+    if(fel){ felGroups.forEach((g,i)=>{if(felActive.has(i))g.addTo(map);}); groups.candidate.addTo(map); }
+    else{ pipeKeys.forEach(k=>{const cb=document.querySelector(`#pipeBlock input[data-k="${k}"]`); if(!cb||cb.checked)groups[k].addTo(map);});
+      const cc=document.querySelector('#pipeBlock input[data-k="candidate"]'); if(!cc||cc.checked)groups.candidate.addTo(map); }
+    updateLegend(fel);
+  }
+  document.getElementById('vPipe').addEventListener('click',()=>setMode('pipe'));
+  document.getElementById('vFel').addEventListener('click',()=>setMode('fel'));
+
+  document.getElementById('candlist').innerHTML=N.candidate.map(c=>
+    `<div class="crow" data-c="${esc(c.name)}"><span class="cd"></span><span class="cn">${esc(c.name)}</span><span class="cs">${esc(c.state)} · ${fmt(c.pop)}</span></div>`).join('');
+  document.querySelectorAll('.crow').forEach(row=>{
+    row.addEventListener('click',()=>{const c=N.candidate.find(x=>x.name===row.dataset.c);
+      map.flyTo([c.lat,c.lon],7,{duration:.8});
+      setTimeout(()=>candMarkers[c.name].openPopup(),820);});
+  });
+
+  updateLegend(false);
+
+  function setTheme(d){document.body.classList.toggle('dark',d);tile.setUrl(d?tileD:tileL);
+    document.getElementById('tDark').classList.toggle('on',d);document.getElementById('tLight').classList.toggle('on',!d);}
+  document.getElementById('tLight').addEventListener('click',()=>setTheme(false));
+  document.getElementById('tDark').addEventListener('click',()=>setTheme(true));
+  const qs=new URLSearchParams(location.search);
+  if(qs.get('embed')==='1'||qs.get('title')==='0') document.body.classList.add('embed');
+  if(qs.get('theme')==='dark') setTheme(true);
+})();
+</script>
+</body>
+</html>
