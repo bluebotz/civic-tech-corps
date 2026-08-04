@@ -36,13 +36,14 @@
   .brand .mk{width:22px;height:22px;border-radius:6px;background:var(--accent);position:relative;flex:0 0 auto}
   .brand .mk::after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:3px;border-right-color:transparent;border-bottom-color:transparent}
   .navlinks{display:flex;align-items:center;gap:28px}
-  .navlinks a{font-size:14px;color:var(--dim);transition:color .2s}
-  .navlinks a:hover{color:var(--ink)}
+  .navlinks a{font-size:14px;transition:color .2s}
+  .navlinks a:not(.btn){color:var(--dim)}
+  .navlinks a:not(.btn):hover{color:var(--ink)}
   .btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
     border-radius:999px;padding:11px 20px;border:1px solid transparent;transition:transform .15s var(--ease),background .2s,border-color .2s;white-space:nowrap}
   .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-primary:hover{background:var(--accent-2)}
+  .btn-primary{background:var(--accent-2);color:#fff}
+  .btn-primary:hover{background:var(--accent)}
   .btn-ghost{border-color:var(--line-2);color:var(--ink)}
   .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
   @media(max-width:720px){.navlinks a:not(.btn){display:none}}
@@ -51,7 +52,7 @@
   h2.big{font-size:clamp(2rem,4.6vw,3.5rem);line-height:1.08;max-width:20ch}
 
   /* hero */
-  #hero{padding:clamp(70px,13vh,150px) 0 clamp(60px,9vh,110px)}
+  #hero{padding-top:clamp(70px,13vh,150px);padding-bottom:clamp(60px,9vh,110px)}
   #hero h1{font-size:clamp(3rem,9vw,6.4rem);line-height:1;letter-spacing:-.03em;font-weight:500}
   #hero h1 em{font-style:italic;color:var(--accent)}
   #hero .lead{margin:28px 0 32px;font-size:clamp(1.1rem,2vw,1.45rem);max-width:44ch}
@@ -106,9 +107,15 @@
   @media(max-width:760px){.gaps{grid-template-columns:1fr}}
 
   /* map */
-  #map-sec .intro{margin-bottom:34px}
+  #map-sec .intro{margin-bottom:34px;max-width:64ch}
   .mapframe{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:0 20px 60px rgba(27,25,22,.08)}
-  .mapframe iframe{display:block;width:100%;height:min(72vh,640px);border:0}
+  .mapframe iframe{display:block;width:100%;height:min(84vh,860px);border:0}
+  @media(max-width:720px){.mapframe iframe{height:min(88vh,640px)}}
+  /* let the map itself run wider than the text column above/below it, capped at 1320px, only where there's room.
+     kept on its own non-.reveal wrapper, since .reveal.in resets transform:none and would cancel the centering. */
+  @media(min-width:1200px){
+    .map-breakout{width:100vw;max-width:1320px;position:relative;left:50%;transform:translateX(-50%)}
+  }
   .mapnote{margin-top:16px;font-size:13px;color:var(--faint);max-width:70ch}
 
   /* model */
@@ -122,10 +129,64 @@
   .ecard .tag{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
   .ecard h3{font-size:1.5rem;margin-bottom:8px}
   .ecard p{color:var(--dim);font-size:.96rem;line-height:1.6}
-  .ecard .houses{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink);font-weight:600}
-  .elink{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);font-size:12px;text-align:center;gap:6px;min-width:120px}
-  .elink .arrow{font-family:'Newsreader',serif;font-size:22px;color:var(--accent)}
-  @media(max-width:760px){.entity{grid-template-columns:1fr}.elink{padding:6px 0}}
+  .elink{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);
+    font-size:11.5px;text-align:center;gap:10px;min-width:150px;padding:0 4px}
+  .elink .frow{display:flex;align-items:center;gap:8px;width:100%}
+  .elink .fic{font-family:'Newsreader',serif;font-size:20px;color:var(--accent);flex:0 0 auto;line-height:1}
+  .elink .flab{font-size:11px;color:var(--ink);font-weight:600;text-align:left;line-height:1.3}
+  .elink .fnote{font-size:11px;color:var(--dim);line-height:1.5;margin-top:2px}
+  @media(max-width:760px){.entity{grid-template-columns:1fr}.elink{padding:10px 0}}
+
+  /* people carousel */
+  #people{background:var(--card);border-top:1px solid var(--line)}
+  #people .intro{margin-bottom:36px}
+  .people-wrap{position:relative}
+  .people-scroll{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding:0 24px;
+    padding:4px 4px 22px;scrollbar-width:none;-ms-overflow-style:none}
+  .people-scroll::-webkit-scrollbar{display:none}
+  .person{scroll-snap-align:start;flex:0 0 auto;width:172px;display:flex;flex-direction:column;align-items:center;
+    text-align:center;gap:9px;padding:22px 16px;border-radius:16px;border:1px solid var(--line);background:var(--bg);
+    cursor:pointer;font:inherit;color:inherit;transition:border-color .2s,transform .2s var(--ease),box-shadow .2s}
+  .person:hover,.person:focus-visible{border-color:var(--accent);transform:translateY(-3px);
+    box-shadow:0 10px 28px rgba(27,25,22,.08);outline:none}
+  .person img{width:88px;height:88px;border-radius:50%;object-fit:cover;display:block;
+    border:1px solid var(--line-2);background:var(--card)}
+  .person .pname{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.3}
+  .person .ptitle{font-size:11.5px;color:var(--dim);line-height:1.42;min-height:2.84em;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .people-arrow{position:absolute;top:112px;width:40px;height:40px;border-radius:50%;background:var(--card);
+    border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;cursor:pointer;
+    z-index:5;box-shadow:0 6px 18px rgba(27,25,22,.1);color:var(--ink);font-size:16px;line-height:1;
+    transition:border-color .2s,color .2s}
+  .people-arrow:hover{border-color:var(--accent);color:var(--accent)}
+  .people-arrow.prev{left:-8px}
+  .people-arrow.next{right:-8px}
+  @media(max-width:760px){.people-arrow{display:none}}
+  @media(max-width:480px){.person{width:132px;padding:18px 12px}.person img{width:72px;height:72px}}
+
+  /* bio modal */
+  .pmodal-overlay{position:fixed;inset:0;background:rgba(27,25,22,.55);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;
+    opacity:0;pointer-events:none;transition:opacity .25s var(--ease)}
+  .pmodal-overlay.open{opacity:1;pointer-events:auto}
+  .pmodal{background:var(--card);border-radius:18px;max-width:560px;width:100%;max-height:min(84vh,720px);
+    overflow-y:auto;padding:34px;position:relative;transform:translateY(14px) scale(.98);
+    transition:transform .25s var(--ease);box-shadow:0 30px 80px rgba(0,0,0,.28)}
+  .pmodal-overlay.open .pmodal{transform:none}
+  .pmodal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line-2);background:var(--bg);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--dim);font-size:18px}
+  .pmodal-close:hover{border-color:var(--accent);color:var(--accent)}
+  .pmodal-head{display:flex;gap:18px;align-items:center;margin-bottom:20px;padding-right:34px}
+  .pmodal-head img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid var(--line-2);flex:0 0 auto}
+  .pmodal-head h3{font-size:1.4rem;margin-bottom:5px}
+  .pmodal-head .ptitle{font-size:13px;color:var(--dim);line-height:1.45}
+  .pmodal-bio{font-size:14.5px;color:var(--ink);line-height:1.68}
+  @media(max-width:600px){
+    .pmodal{padding:24px 20px;border-radius:14px}
+    .pmodal-head{flex-direction:column;align-items:flex-start;gap:12px;padding-right:26px}
+    .pmodal-head img{width:64px;height:64px}
+  }
 
   /* close */
   #close{text-align:center;background:var(--card);border-top:1px solid var(--line)}
@@ -146,9 +207,11 @@
 <nav id="nav"><div class="wrap">
   <a class="brand" href="#top"><span class="mk"></span>Civic Tech Corps</a>
   <div class="navlinks">
+    <a href="#map-sec">The map</a>
     <a href="#cases">The cases</a>
     <a href="#gap">The gap</a>
     <a href="#model">The model</a>
+    <a href="#people">Advisors</a>
     <a class="btn btn-primary" href="#close">Partner with us</a>
   </div>
 </div></nav>
@@ -168,7 +231,21 @@
     <div><b>One pattern</b>local government without the capacity to govern</div>
   </div>
 </header>
-
+<section id="map-sec">
+  <div class="wrap">
+    <div class="intro reveal">
+      <p class="eyebrow">The pipeline</p>
+      <h2 class="big">Recruit the strongest technical talent. Channel it where the field never goes.</h2>
+      <p class="lead">Recruiting begins at the region's HBCUs and the country's top technical schools. The map traces those pipelines into the very communities that failed for lack of capacity. Switch the view to see, for comparison, where the existing national fellowships actually place their people.</p>
+    </div>
+    <div class="map-breakout">
+      <div class="mapframe reveal">
+        <iframe src="map.html?embed=1" title="Civic Tech Corps recruiting pipeline map" loading="lazy"></iframe>
+      </div>
+    </div>
+    <p class="mapnote reveal">Flowing lines show talent recruited from HBCUs (pink) and national schools (blue) into the five featured communities. Toggle to "Existing fellowships" for the full placement dataset behind this work.</p>
+  </div>
+</section>
 <section id="cases">
   <div class="wrap">
     <div class="intro reveal">
@@ -248,7 +325,6 @@
     </article>
   </div>
 </section>
-
 <section id="pattern">
   <div class="wrap">
     <h2 class="reveal">Read together, these five make a single argument.</h2>
@@ -256,7 +332,6 @@
     <p class="reveal" style="margin-top:22px"><span class="kick">The binding constraint across the South is a shortage of durable technical and administrative capacity inside the government itself.</span> Not a shortage of laws. Not always a shortage of money. That is the gap Civic Tech Corps is built to close.</p>
   </div>
 </section>
-
 <section id="gap">
   <div class="wrap">
     <p class="eyebrow reveal">The regional landscape</p>
@@ -284,21 +359,6 @@
     </div>
   </div>
 </section>
-
-<section id="map-sec">
-  <div class="wrap">
-    <div class="intro reveal">
-      <p class="eyebrow">The pipeline</p>
-      <h2 class="big">Recruit the strongest technical talent. Channel it where the field never goes.</h2>
-      <p class="lead">Recruiting begins at the region's HBCUs and the country's top technical schools. The map traces those pipelines into the very communities that failed for lack of capacity. Switch the view to see, for comparison, where the existing national fellowships actually place their people.</p>
-    </div>
-    <div class="mapframe reveal">
-      <iframe src="map.html?embed=1" title="Civic Tech Corps recruiting pipeline map" loading="lazy"></iframe>
-    </div>
-    <p class="mapnote reveal">Flowing lines show talent recruited from HBCUs (pink) and national schools (blue) into the five featured communities. Toggle to "Existing fellowships" for the full placement dataset behind this work.</p>
-  </div>
-</section>
-
 <section id="model">
   <div class="wrap">
     <div class="intro reveal">
@@ -323,43 +383,158 @@
 
     <div class="entity">
       <div class="ecard reveal">
-        <div class="tag">Nonprofit</div>
-        <h3>Civic Tech Corps Institute</h3>
-        <p>The mission home. It recruits and places fellows and stewards the public good.</p>
-        <div class="houses">Houses the Open Civic AI Commons</div>
+        <div class="tag">Nonprofit · Boots on the ground</div>
+        <h3>Civic Tech Corps Fellowship</h3>
+        <p>Recruits and places fellows directly inside local government offices — the people who show up, do the work, and stay long enough to leave real systems behind.</p>
       </div>
       <div class="elink reveal">
-        <span class="arrow">&harr;</span>
-        <span>The Institute holds a minority equity stake in the Lab. Outside investors hold the remainder.</span>
+        <div class="frow"><span class="fic">&darr;</span><span class="flab">Tools, data &amp; shared standards</span></div>
+        <div class="frow"><span class="fic">&uarr;</span><span class="flab">Field insight &amp; real deployments</span></div>
+        <div class="fnote">The Lab equips the field. The Fellowship proves what the Lab builds.</div>
       </div>
       <div class="ecard reveal">
-        <div class="tag">Public benefit corporation</div>
-        <h3>Civic Tech Corps Lab</h3>
-        <p>The build engine. It develops and sustains the technology, and raises outside capital.</p>
-        <div class="houses">Hosts the Open Civic AI Lab</div>
+        <div class="tag">Public benefit corporation · Continual support</div>
+        <h3>Open Civic AI Lab</h3>
+        <p>Builds and sustains the shared technology — an open API standard and data infrastructure that keeps every placement connected long after a fellow moves on.</p>
       </div>
     </div>
   </div>
 </section>
+<section id="people">
+  <div class="wrap">
+    <div class="intro reveal">
+      <p class="eyebrow">Who's behind it</p>
+      <h2 class="big">Advisors.</h2>
+      <p class="lead">Tap anyone below to read their full bio.</p>
+    </div>
+    <div class="people-wrap reveal">
+      <button class="people-arrow prev" id="peoplePrev" aria-label="Scroll left" type="button">&larr;</button>
+      <div class="people-scroll" id="peopleScroll"></div>
+      <button class="people-arrow next" id="peopleNext" aria-label="Scroll right" type="button">&rarr;</button>
+    </div>
+  </div>
+</section>
 
+<div class="pmodal-overlay" id="pmodalOverlay">
+  <div class="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmodalName">
+    <button class="pmodal-close" id="pmodalClose" aria-label="Close bio" type="button">&times;</button>
+    <div class="pmodal-head">
+      <img id="pmodalImg" src="" alt="">
+      <div>
+        <h3 id="pmodalName"></h3>
+        <div class="ptitle" id="pmodalTitle"></div>
+      </div>
+    </div>
+    <div class="pmodal-bio" id="pmodalBio"></div>
+  </div>
+</div>
 <section id="close">
   <div class="wrap">
     <h2 class="reveal">Funders are moving South after decades of neglect.</h2>
     <p class="lead reveal">Capacity is the missing piece that makes those dollars land. Civic Tech Corps builds the governing muscle that turns hard-won local power into a government that can actually deliver.</p>
     <div class="reveal" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
       <a class="btn btn-primary" href="mailto:hello@civictechcorps.org">Partner with us</a>
-      <a class="btn btn-ghost" href="#cases">Revisit the evidence</a>
+      <a class="btn btn-ghost" href="#map-sec">Revisit the evidence</a>
     </div>
   </div>
 </section>
 
 <footer><div class="wrap">
   <a class="brand" href="#top"><span class="mk"></span>Civic Tech Corps</a>
-  <div class="struct">Civic Tech Corps Institute, a nonprofit, houses the Open Civic AI Commons and holds a minority equity stake in Civic Tech Corps Lab, a public benefit corporation that hosts the Open Civic AI Lab.</div>
+  <div class="struct">Civic Tech Corps Fellowship, a nonprofit, places technologists inside local government. Open Civic AI Lab, a public benefit corporation, builds and sustains the shared technology that supports them.</div>
 </div></footer>
 
 <script>
 (function(){
+  const esc=s=>(''+(s||'')).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const PEOPLE=[
+    {img:'img/team/stacey-abrams.jpg',name:'Stacey Abrams',
+     title:'Former Georgia House Minority Leader · Founder, Fair Fight Action',state:'Georgia',
+     bio:"Stacey Abrams is a New York Times bestselling author, entrepreneur, producer, and political leader. She served eleven years in the Georgia House of Representatives, seven as minority leader, and was the first Black woman to become the gubernatorial nominee for a major party in U.S. history. She has founded multiple organizations devoted to voting rights and economic opportunity, including Fair Fight Action, Fair Count, the Southern Economic Advancement Project, and the American Pride Rises Network, and co-founded the financial services firm NOWaccount, infrastructure and energy firm Insomnia Consulting, and beverage company Nourish, Inc. She held the Ronald W. Walters Endowed Chair for Race and Black Politics at Howard University and served as senior counsel to Rewiring America. Her documentary All In: The Fight for Democracy was shortlisted for the Academy Awards, and her projects have won NAACP Image Awards in 2021, 2022, and 2023. A tax attorney by training, she holds degrees from Spelman College, the LBJ School of Public Affairs at the University of Texas, and Yale Law School."},
+    {img:'img/team/aneesh-chopra.jpg',name:'Aneesh Chopra',
+     title:'First Chief Technology Officer of the United States · Co-Founder & President, CareJourney',state:'Virginia',
+     bio:"Aneesh Chopra served as the first Chief Technology Officer of the United States, appointed by President Obama in 2009. As a senior advisor to the President, he championed an open-innovation strategy across the federal government, designed the National Wireless Initiative, launched the Blue Button program giving veterans digital access to their health records, and spearheaded Startup America. Before federal service, he served as Virginia's Secretary of Technology under Governor Tim Kaine, where statewide performance-management innovations helped earn Virginia recognition as one of the best-managed states in the country. He is co-founder and president of CareJourney, a healthcare analytics company applying open data to improve care delivery, and author of Innovative State: How New Technologies Can Transform Government. He holds a B.A. in public health from Johns Hopkins and a Master of Public Policy from Harvard Kennedy School."},
+    {img:'img/team/sam-liccardo.jpg',name:'Sam Liccardo',
+     title:"U.S. Representative, California's 16th District · Former Mayor of San José",state:'California',
+     bio:"Congressman Sam Liccardo represents California's 16th Congressional District, stretching from Half Moon Bay and Pacifica through San José, Palo Alto, and Mountain View. Before joining Congress in 2025, he served two terms as Mayor of San José, leading major economic growth, transformative housing initiatives, and climate resilience efforts — San José became the largest U.S. city to commit to carbon neutrality and was recognized as the safest large city in America under his leadership. He now serves on the House Committee on Financial Services and chairs the New Democratic Coalition's Innovation and Technology Working Group. He has deep ties to the GovAI Coalition, which grew through Albert Gehami's work during his mayoralty. Before public service, he was a criminal and federal prosecutor in the Southern District of California. He holds degrees from Harvard Law School, Harvard Kennedy School, and Georgetown University."},
+    {img:'img/team/sonal-shah.jpg',name:'Sonal Shah',
+     title:'Board Chair, Consumer Reports · Former CEO, The Texas Tribune',state:'Texas',
+     bio:"Sonal Shah is board chair of Consumer Reports and former CEO of The Texas Tribune. Over 25 years she has started and led social-impact efforts across academia, government, and the private and philanthropic sectors, including as interim EVP at United Way Worldwide, founder of The Asian American Foundation, and founder of Georgetown's Beeck Center for Social Impact and Innovation. She led the White House Office of Social Innovation and Civic Participation under President Obama, was an international economist at the Treasury Department, and served as policy director for Pete Buttigieg's presidential campaign. In the private sector she led environmental strategy at Goldman Sachs and global impact investment at Google. She grew up in Houston and holds degrees in economics from the University of Chicago and Duke University."},
+    {img:'img/team/larry-irving.jpg',name:'Larry Irving',
+     title:'Former U.S. Assistant Secretary of Commerce · Internet Hall of Fame Inductee',state:'Washington, D.C.',
+     bio:"Larry Irving is one of the architects of modern U.S. internet and telecommunications policy, credited with putting “the digital divide” on the national and global agenda. As Assistant Secretary of Commerce and head of the NTIA, he was a senior adviser to President Clinton and Vice President Gore and a principal architect of the administration's telecommunications, internet, and e-commerce policy, including the 1996 Telecommunications Act. He authored NTIA's landmark Falling Through the Net series, the first empirical research documenting the digital divide. In 2019 he became the first African American inducted into the Internet Hall of Fame. He chairs the board of PBS and serves on the boards of the North American Electric Reliability Corporation, The Texas Tribune, The Second City, and Logitix. He holds a B.A. from Northwestern and a J.D. from Stanford Law School."},
+    {img:'img/team/bruce-cain.jpg',name:'Bruce Cain',
+     title:'Professor of Political Science, Stanford University · Director, Bill Lane Center for the American West',state:'California',
+     bio:"Bruce E. Cain is a professor of political science at Stanford University and director of the Bill Lane Center for the American West. He holds a BA from Bowdoin, a B.Phil. from Oxford as a Rhodes Scholar, and a Ph.D. from Harvard, and taught at Caltech and UC Berkeley before Stanford. He was formerly director of the Institute of Governmental Studies at UC Berkeley and executive director of the UC Washington Center. Elected to the American Academy of Arts and Sciences in 2000, he has won the Richard F. Fenno Prize for research and the Zale Award for public service. His expertise spans political regulation, applied democratic theory, representation, and state politics; he currently works on problems of environmental governance."},
+    {img:'img/team/dan-schnur.jpg',name:'Dan Schnur',
+     title:'Professor, UC Berkeley IGS · Pepperdine · USC Annenberg',state:'California',
+     bio:"Dan Schnur is a professor at UC Berkeley's Institute of Governmental Studies, Pepperdine's Graduate School of Public Policy, and USC's Annenberg School of Communications, teaching politics, communications, and leadership. He writes regularly for AllSides and has been published in The New York Times, The Washington Post, The Wall Street Journal, and the Los Angeles Times. He was national director of communications for John McCain's 2000 presidential campaign and chief media spokesman for California Governor Pete Wilson, and co-founded the Voices of Reform project, which laid the groundwork for California's redistricting reform. He has advised the Gates, Hewlett, Broad, Pew, and Irvine foundations, and the Public Policy Institute of California, on K-12 and workforce issues. He is a graduate of American University."},
+    {img:'img/team/steve-phillips.jpg',name:'Steve Phillips',
+     title:'Founder, Democracy in Color · Author, Brown Is the New White',state:'California',
+     bio:"Steve Phillips is a national civic leader, bestselling author, and columnist. He wrote the New York Times bestseller Brown Is the New White: How the Demographic Revolution Has Created a New American Majority, and is a columnist for The Guardian and The Nation and an opinion contributor to The New York Times. He hosts the podcast Democracy in Color with Steve Phillips and founded Democracy in Color, a media organization focused on civic participation and the evolving American electorate. A graduate of Stanford University and UC Law San Francisco, he practiced employment and public-interest law for many years and has appeared on NBC, CNN, MSNBC, and C-SPAN."},
+    {img:'img/team/lenny-mendonca.jpg',name:'Lenny Mendonca',
+     title:'Senior Partner Emeritus, McKinsey & Company · Former Chief Economic Advisor to the Governor of California',state:'California',
+     bio:"Lenny Mendonca is senior partner emeritus of McKinsey & Company and a lecturer on inequality at Stanford's Graduate School of Business. He founded McKinsey's U.S. state and local public-sector practice, chaired the McKinsey Global Institute, and served a decade on the McKinsey Shareholder Council. He previously served as chief economic and business advisor to the Governor of California and chaired the California High-Speed Rail Authority. He is vice-chair of Western Governors University, chair emeritus of the Bay Area Council, and co-founder and chair of FuseCorps. He holds an MBA and a certificate in public management from Stanford and an AB, magna cum laude, in economics from Harvard."},
+    {img:'img/team/vivek-viswanathan.jpg',name:'Vivek Viswanathan',
+     title:'Fellow, Stanford Institute for Economic Policy Research · Former Special Assistant to the President',state:'California',
+     bio:"Vivek Viswanathan is a fellow at the Stanford Institute for Economic Policy Research. He previously served as Special Assistant to the President and Senior Advisor to the Deputy Chief of Staff at the White House, and before that as a senior policy advisor on the White House National Economic Council. He served as senior counselor and senior budget and fiscal advisor to the Governor of California, and was a candidate for California State Treasurer in 2018. Born in Brooklyn to parents of Indian descent, he holds a summa cum laude degree from Harvard, an MPhil as a Henry Fellow from Cambridge, and JD and MBA degrees from Stanford."},
+    {img:'img/team/ernestine-fu-mak.jpg',name:'Ernestine Fu Mak',
+     title:'Co-Director, Stanford Frontier Technology Lab · Founder, Brave Capital',state:'California',
+     bio:"Dr. Ernestine Fu Mak is co-director of Stanford FTL (Frontier Technology Lab), an initiative of Stanford's School of Engineering and Doerr School of Sustainability, where she teaches courses spanning frontier technology, circular-economy design, autonomous vehicles, venture capital, and Silicon Valley and government. She founded Brave Capital and is a venture partner at Alsop Louie Partners. She was named to Forbes' inaugural 30 Under 30 list and is a Kauffman and Eisenhower Fellow. A strong advocate for civic participation, she co-authored Civic Work, Civic Lessons and Renewed Energy, and has advised nonprofits including Ad Council, California 100, and the Presidio Institute. She completed her B.S., M.S., MBA, Ph.D., and postdoc at Stanford."},
+    {img:'img/team/anthony-fisher.jpg',name:'Anthony Fisher',
+     title:'Data Governance & Artificial Intelligence Lead, Colorado Department of Revenue',state:'Colorado',
+     bio:"Anthony Fisher is the Data Governance and Artificial Intelligence Lead for the Colorado Department of Revenue."},
+    {img:'img/team/prathm-juneja.jpg',name:'Prathm Juneja',
+     title:'Rhodes Scholar · PhD Candidate, Oxford Internet Institute',state:'United Kingdom',
+     bio:"Prathm Juneja is a Rhodes Scholar and PhD candidate in Social Data Science at Oxford's Internet Institute, researching how public institutions adopt and govern AI. He is also a senior fellow at Arizona State University's Mechanics of Democracy Lab. He has trained senior officials and advised governments across more than 40 countries, including the U.S., Ukraine, Armenia, and the Commonwealth Secretariat, on AI policy, democracy, procurement, and implementation. He authored International IDEA's flagship report on AI for electoral management, translated into three languages and read by election officials worldwide. Earlier, he served as deputy distributed data director on a 2020 U.S. presidential campaign and worked with U.S. city governments to deploy machine-learning and data-science tools."},
+    {img:'img/team/albert-gehami.jpg',name:'Albert Gehami',
+     title:'City AI & Privacy Officer, City of San José · Founder, GovAI Coalition',state:'California',
+     bio:"Albert Gehami is the City AI and Privacy Officer for the City of San José, overseeing responsible AI and data deployment across an organization of 7,000 employees serving one million residents. He founded and manages the GovAI Coalition, a national collaborative of over 2,000 members spanning 700 local, state, and federal agencies and 200 industry and civil-society partners committed to responsible AI in the public sector. Under his leadership, San José became one of the first U.S. cities with comprehensive AI governance guidelines, since adopted by more than 100 agencies nationwide. In 2026 he was appointed to the Advisory Council of the Center for Democracy and Technology. He previously consulted at Boston Consulting Group and worked as a data scientist for the Mayor's Gang Prevention Task Force. He holds a B.A. in economics and an M.A. in public policy from Stanford."},
+    {img:'img/team/daniel-rich.jpg',name:'Daniel Rich',
+     title:'Former City Manager, Mountain View & Campbell, California',state:'California',
+     bio:"Dan Rich has over 30 years of public-sector experience, including 27 years in Bay Area local-government management. After roles in the city managers' offices of Sunnyvale and Belmont, he was appointed City Manager of Campbell in 2005, then City Manager of Mountain View from 2011 until his retirement in 2019. He helped lead Campbell through the Great Recession and worked on complex land-use partnerships and award-winning long-range planning in Mountain View, as well as statewide pension reform and regional transportation and housing issues. He has partnered with Stanford's Bill Lane Center and Haas Center for Public Service over the years, serving as City Manager in Residence in 2018. A Bay Area native, he holds a BA in economics and political science from UC Berkeley and a Master in Public Policy from Harvard."},
+    {img:'img/team/pedro-arcain.jpg',name:'Pedro Arcain',
+     title:'Lecturer, Stanford University · EU Regulatory & Public Affairs Lead, Amazon',state:'United Kingdom',
+     bio:"Pedro Arcain is a lecturer at Stanford University whose work explores the intersection of public policy, government, and public law — how institutional design improves governance, how informal networks and lobbying shape regulatory outcomes, and how regulatory approaches affect major infrastructure and technology projects. Before Stanford, he held postdoctoral fellowships at Oxford's Faculty of Law and Blavatnik School of Government, and at Harvard Kennedy School. He currently leads EU regulatory and public affairs at Amazon and previously served as Head of Policy at the UK energy regulator. He has also contributed to the Victor Nunes Leal Chair at Brazil's Supreme Court and the Democracy Program at Harvard's Ash Center. Pedro is a qualified lawyer in Brazil."},
+    {img:'img/team/william-sentance.jpg',name:'William Sentance',
+     title:'Founder, Codesmith · Visiting Policy Fellow, Oxford Internet Institute',state:'United Kingdom',
+     bio:"Will Sentance is a visiting policy fellow at the Oxford Internet Institute, researching how emerging AI tools intersect with human learning and institutional capacity, and is currently building embodied AI tools at South Park Commons in San Francisco. He founded Codesmith, the largest independent software engineering school in the U.S., which he scaled over a decade into an industry-leading engineering residency that has trained more than 5,000 engineers for organizations including Google, Anthropic, and the UN. He also produces the widely used Hard Parts series of technical courses on Frontend Masters, covering neural networks, JavaScript, and AI agents. He studied at Oxford and was a Mossavar-Rahmani Fellow at Harvard."},
+  ];
+
+  const scrollEl=document.getElementById('peopleScroll');
+  if(scrollEl){
+    scrollEl.innerHTML=PEOPLE.map((p,i)=>`
+      <button class="person" type="button" data-i="${i}">
+        <img src="${p.img}" alt="${esc(p.name)}" loading="lazy">
+        <span class="pname">${esc(p.name)}</span>
+        ${p.title?`<span class="ptitle">${esc(p.title)}</span>`:`<span class="ptitle">Bio coming soon</span>`}
+      </button>`).join('');
+
+    const prevBtn=document.getElementById('peoplePrev'), nextBtn=document.getElementById('peopleNext');
+    const scrollByCard=dir=>{const card=scrollEl.querySelector('.person');
+      const dist=card?card.offsetWidth+18:200; scrollEl.scrollBy({left:dir*dist*2,behavior:'smooth'});};
+    prevBtn&&prevBtn.addEventListener('click',()=>scrollByCard(-1));
+    nextBtn&&nextBtn.addEventListener('click',()=>scrollByCard(1));
+
+    const overlay=document.getElementById('pmodalOverlay');
+    const mImg=document.getElementById('pmodalImg'), mName=document.getElementById('pmodalName'),
+      mTitle=document.getElementById('pmodalTitle'), mBio=document.getElementById('pmodalBio');
+    function openPerson(p){
+      mImg.src=p.img; mImg.alt=p.name; mName.textContent=p.name;
+      mTitle.textContent=p.title||'Bio coming soon.';
+      mBio.textContent=p.bio||'Full bio to come.';
+      overlay.classList.add('open'); document.body.style.overflow='hidden';
+    }
+    function closeModal(){overlay.classList.remove('open'); document.body.style.overflow='';}
+    scrollEl.addEventListener('click',e=>{
+      const btn=e.target.closest('.person'); if(!btn) return;
+      openPerson(PEOPLE[+btn.dataset.i]);
+    });
+    document.getElementById('pmodalClose').addEventListener('click',closeModal);
+    overlay.addEventListener('click',e=>{if(e.target===overlay) closeModal();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModal();});
+  }
+
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const nav=document.getElementById('nav');
   const sentinel=document.createElement('div');

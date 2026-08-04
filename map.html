@@ -23,6 +23,12 @@
   #title{top:14px;left:50%;transform:translateX(-50%);padding:8px 18px;text-align:center;max-width:min(92vw,540px)}
   #title b{font-size:14px;color:var(--txt)}#title div{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.4}
   #ctrl{top:14px;left:14px;padding:13px 14px;width:238px;font-size:12px;max-height:calc(100vh - 28px);overflow-y:auto}
+  .ctrl-head{display:flex;width:100%;align-items:center;justify-content:space-between;
+    background:transparent;border:0;cursor:pointer;padding:0;font:inherit;color:var(--txt)}
+  .ctrl-head h4{margin:0}
+  .ctrl-head .chev{color:var(--dim);font-size:12px;transition:transform .2s;flex:0 0 auto}
+  #ctrl.collapsed .chev{transform:rotate(-90deg)}
+  #ctrl.collapsed #ctrlBody{display:none}
   h4{margin:0 0 6px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.1px;font-weight:600}
   .lyr{display:flex;align-items:center;gap:8px;margin:2px 0;cursor:pointer;padding:3px 4px;border-radius:6px}
   .lyr:hover{background:var(--hover)}.lyr input{accent-color:var(--accent)}
@@ -55,6 +61,10 @@
   .leaflet-bar a{background:var(--panel);color:var(--txt);border-color:var(--line)}
   .leaflet-control-attribution{background:rgba(255,255,255,.78)!important;color:#6b7280!important;font-size:9px}
   body.dark .leaflet-control-attribution{background:rgba(11,16,32,.8)!important;color:#8a99b5!important}
+  /* intuitive glyph markers (civic buildings, schools) instead of plain dots */
+  .gicon{background:transparent;border:0}
+  .gicon-badge{display:flex;align-items:center;justify-content:center;border-radius:50%;
+    border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.3);line-height:1;cursor:pointer}
   /* flowing recruiting arcs */
   .arc{stroke-dasharray:5 9;animation:flow 1s linear infinite}
   .arc.elite{stroke-dasharray:2 8;animation-duration:1.4s}
@@ -74,7 +84,54 @@
   .pp .ctx{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5}
   .pp .why{font-size:11.5px;margin-top:9px;line-height:1.5;padding:8px 10px;background:var(--hover);border-radius:8px;border-left:2px solid var(--cand)}
   body.embed #title{display:none}
-  @media(max-width:660px){#cand{display:none}}
+
+  /* tour */
+  .tourfab{left:50%;bottom:20px;transform:translateX(-50%);padding:12px 20px;border-radius:999px;
+    font-size:13px;font-weight:700;cursor:pointer;color:#fff;background:var(--cand);border:0;
+    display:flex;align-items:center;gap:8px;z-index:1100;box-shadow:0 10px 26px rgba(217,119,6,.35);
+    font-family:inherit;white-space:nowrap}
+  .tourfab:hover{background:#c26c05}
+  #tourYear{top:14px;left:50%;transform:translateX(-50%);padding:9px 22px;font-family:Georgia,serif;
+    font-size:30px;font-weight:700;color:var(--txt);z-index:1100;opacity:0;transition:opacity .3s;pointer-events:none}
+  #tourYear.show{opacity:1}
+  .tourbar{left:50%;bottom:20px;transform:translateX(-50%);width:min(92vw,560px);padding:16px 18px;
+    z-index:1100;display:flex;flex-direction:column;gap:12px}
+  .tourbar[hidden]{display:none}
+  .tourtext{font-size:13px;line-height:1.55;color:var(--txt)}
+  .tourrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .tourprog{display:flex;gap:5px}
+  .tourprog span{width:16px;height:3px;border-radius:2px;background:var(--line)}
+  .tourprog span.on{background:var(--cand)}
+  .tourbtns{display:flex;align-items:center;gap:8px}
+  .tbtn{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--txt);
+    border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:600;font-family:inherit}
+  .tbtn:hover{border-color:var(--cand);color:var(--cand)}
+  .tclose{border:0;background:transparent;color:var(--dim);font-size:19px;line-height:1;cursor:pointer;padding:2px 4px}
+  .tclose:hover{color:var(--txt)}
+  #tourLegend{bottom:16px;left:14px;padding:9px 13px;font-size:11px;max-width:220px;z-index:1100;
+    display:flex;flex-wrap:wrap;align-items:center;gap:3px 12px}
+  #tourLegend h4{flex-basis:100%;margin:0 0 2px}
+  #tourLegend .leg{margin:0;white-space:nowrap}
+  body.touring .panel:not(.tourbar):not(#tourYear):not(#tourLegend){display:none!important}
+  body.touring .tourfab{display:none}
+
+  /* mobile */
+  @media(max-width:660px){
+    #cand{left:0;right:0;bottom:0;width:100%;border-radius:16px 16px 0 0;padding:10px 14px 12px}
+    #candlist{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+    #candlist .crow{flex:0 0 auto;flex-direction:column;align-items:flex-start;gap:2px;
+      padding:7px 11px;background:var(--hover);border-radius:10px;min-width:108px}
+    #candlist .crow .cn{font-size:11px;white-space:nowrap}
+    #candlist .crow .cs{font-size:9.5px}
+    #legend{display:none}
+    #ctrl{width:min(226px,58vw);font-size:11.5px;padding:11px 12px}
+    .tourfab{bottom:98px}
+    /* keep the tour's program legend out of the map's focal (southern) area on small screens */
+    #tourLegend{top:56px;left:8px;right:8px;bottom:auto;max-width:none;padding:8px 10px;
+      font-size:9.5px;gap:2px 10px}
+    #tourLegend .dot,#tourLegend .sw{width:8px;height:8px}
+  }
+  @media(max-width:400px){#ctrl{width:min(200px,56vw)}}
 </style>
 </head>
 <body>
@@ -83,29 +140,34 @@
   <div>Civic Tech Corps recruits technical talent from HBCUs and top schools, then channels it into the communities the field overlooks.</div></div>
 
 <div id="ctrl" class="panel">
-  <h4>View</h4>
-  <div class="seg"><button class="segbtn on" id="vPipe">Our pipeline</button><button class="segbtn" id="vFel">Existing fellowships</button></div>
-  <hr>
-  <div id="pipeBlock">
-    <h4>The pipeline</h4>
-    <label class="lyr"><input type="checkbox" checked data-k="arcs"><span class="barc"></span><span class="nm">Recruiting connections</span></label>
-    <label class="lyr"><input type="checkbox" checked data-k="candidate"><span class="dot" style="background:var(--cand)"></span><span class="nm">Candidate communities</span></label>
-    <label class="lyr"><input type="checkbox" checked data-k="hbcu"><span class="dot" style="background:var(--hbcu)"></span><span class="nm">HBCUs (technical degrees)</span></label>
-    <label class="lyr"><input type="checkbox" checked data-k="elite"><span class="dot" style="background:var(--elite)"></span><span class="nm">Target recruiting schools</span></label>
-    <label class="lyr"><input type="checkbox" checked data-k="community"><span class="dot" style="background:var(--comm)"></span><span class="nm">Council-manager communities</span></label>
+  <button id="ctrlToggle" class="ctrl-head" type="button">
+    <h4>View</h4>
+    <span class="chev">&#9662;</span>
+  </button>
+  <div id="ctrlBody">
+    <div class="seg"><button class="segbtn on" id="vPipe">Our pipeline</button><button class="segbtn" id="vFel">Existing fellowships</button></div>
     <hr>
-    <h4>For comparison</h4>
-    <label class="lyr"><input type="checkbox" checked data-k="placements"><span class="dot" style="background:var(--field)"></span><span class="nm">Where fellowships go today</span></label>
-    <div class="sub">The faint dots are 1,130 existing placements from six national fellowships. Notice how few reach the communities we target.</div>
+    <div id="pipeBlock">
+      <h4>The pipeline</h4>
+      <label class="lyr"><input type="checkbox" checked data-k="arcs"><span class="barc"></span><span class="nm">Recruiting connections</span></label>
+      <label class="lyr"><input type="checkbox" checked data-k="candidate"><span class="dot" style="background:var(--cand)"></span><span class="nm">Candidate communities</span></label>
+      <label class="lyr"><input type="checkbox" checked data-k="hbcu"><span class="dot" style="background:var(--hbcu)"></span><span class="nm">HBCUs (technical degrees)</span></label>
+      <label class="lyr"><input type="checkbox" checked data-k="elite"><span class="dot" style="background:var(--elite)"></span><span class="nm">Target recruiting schools</span></label>
+      <label class="lyr"><input type="checkbox" data-k="community"><span class="dot" style="background:var(--comm)"></span><span class="nm">Council-manager communities</span></label>
+      <hr>
+      <h4>For comparison</h4>
+      <label class="lyr"><input type="checkbox" checked data-k="placements"><span class="dot" style="background:var(--field)"></span><span class="nm">Where fellowships go today</span></label>
+      <div class="sub">The faint dots are 1,130 existing placements from six national fellowships. Notice how few reach the communities we target.</div>
+    </div>
+    <div id="felBlock" style="display:none">
+      <h4>Fellowships</h4>
+      <div id="felToggles"></div>
+      <div class="sub">Every placement from the six national fellowships, colored by program and sized by fellows. Click a dot to see who was placed there. Candidate communities stay marked in gold for comparison.</div>
+    </div>
+    <hr>
+    <h4>Map theme</h4>
+    <div class="seg"><button class="segbtn on" id="tLight">Light</button><button class="segbtn" id="tDark">Dark</button></div>
   </div>
-  <div id="felBlock" style="display:none">
-    <h4>Fellowships</h4>
-    <div id="felToggles"></div>
-    <div class="sub">Every placement from the six national fellowships, colored by program and sized by fellows. Click a dot to see who was placed there. Candidate communities stay marked in gold for comparison.</div>
-  </div>
-  <hr>
-  <h4>Map theme</h4>
-  <div class="seg"><button class="segbtn on" id="tLight">Light</button><button class="segbtn" id="tDark">Dark</button></div>
 </div>
 
 <div id="cand" class="panel">
@@ -114,6 +176,20 @@
 </div>
 
 <div id="legend" class="panel"></div>
+
+<button id="tourFab" class="panel tourfab" type="button">&#9654; Show me how it works</button>
+<div id="tourYear" class="panel"></div>
+<div id="tourLegend" class="panel" style="display:none"></div>
+<div id="tourBar" class="panel tourbar" hidden>
+  <div class="tourtext" id="tourText"></div>
+  <div class="tourrow">
+    <div class="tourprog" id="tourProg"></div>
+    <div class="tourbtns">
+      <button class="tbtn" id="tourNext" type="button">Next</button>
+      <button class="tclose" id="tourClose" type="button" aria-label="Close tour">&times;</button>
+    </div>
+  </div>
+</div>
 
 <script src="network_data.js"></script>
 <script>
@@ -127,7 +203,8 @@
   const US=[[8,-135],[54,-58]];
   const tileL='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
   const tileD='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-  const map=L.map('map',{zoomControl:false,minZoom:4,maxZoom:12,maxBounds:US,maxBoundsViscosity:.3});
+  const map=L.map('map',{zoomControl:false,minZoom:4,maxZoom:12,maxBounds:US,maxBoundsViscosity:.3,
+    renderer:L.canvas({padding:0.5})});
   map.fitBounds([[25.5,-124],[48.5,-67]],{padding:[8,8]});
   L.control.zoom({position:'topright'}).addTo(map);
   let tile=L.tileLayer(tileL,{subdomains:'abcd',minZoom:4,maxZoom:12,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
@@ -141,22 +218,34 @@
       fill:true,fillColor:COL.field,fillOpacity:.5}).addTo(groups.placements);
   });
 
-  // recruiting arcs (school -> community), curved + flowing
-  function arc(a,b,k){
+  // recruiting arcs (school -> community), curved + flowing — kept on their own SVG renderer so the
+  // CSS dash-flow animation still works even though the rest of the map draws on canvas for performance
+  // generous padding so cross-country arcs (e.g. Stanford, MIT) still render when zoomed tight on the South —
+  // otherwise Leaflet culls SVG paths that fall outside the renderer's padded viewport bounds
+  const arcRenderer=L.svg({padding:8});
+  function arc(a,b,k,maxOffDeg){
     const dLat=b[0]-a[0], dLon=b[1]-a[1], dist=Math.hypot(dLat,dLon)||1;
-    let pl=-dLon/dist, po=dLat/dist;            // perpendicular (lat,lon)
-    if(pl<0){ pl=-pl; po=-po; }                  // bow north
-    const off=dist*k, c=[(a[0]+b[0])/2+pl*off, (a[1]+b[1])/2+po*off];
+    let pl=-dLon/dist, po=dLat/dist;             // perpendicular (lat,lon)
+    if(po<0){ pl=-pl; po=-po; }                  // always bow north, regardless of travel direction
+    const off=Math.min(dist*k, maxOffDeg);        // cap the bow so long cross-country arcs don't swing wildly
+    const c=[(a[0]+b[0])/2+pl*off, (a[1]+b[1])/2+po*off];
     const pts=[]; for(let i=0;i<=28;i++){ const t=i/28, u=1-t;
       pts.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0], u*u*a[1]+2*u*t*c[1]+t*t*b[1]]); }
     return pts;
   }
   N.arcs.forEach(A=>{
-    L.polyline(arc(A.a,A.b,0.16),{color:COL[A.t],weight:A.t==='hbcu'?1.9:1.4,
-      opacity:A.t==='hbcu'?.55:.4,className:'arc '+A.t}).addTo(groups.arcs);
+    const isLocal=A.t==='hbcu';
+    L.polyline(arc(A.a,A.b,isLocal?0.18:0.09,isLocal?1.2:3.5),{color:COL[A.t],weight:isLocal?1.9:1.4,
+      opacity:isLocal?.55:.4,className:'arc '+A.t,renderer:arcRenderer}).addTo(groups.arcs);
   });
 
   // council-manager communities
+  // intuitive marker shapes: a civic-building glyph for government jurisdictions, a graduation cap for schools
+  function glyphIcon(emoji,color,size){
+    return L.divIcon({className:'gicon',
+      html:`<span class="gicon-badge" style="background:${color};width:${size}px;height:${size}px;font-size:${Math.round(size*.58)}px">${emoji}</span>`,
+      iconSize:[size,size],iconAnchor:[size/2,size/2],popupAnchor:[0,-size/2-2]});
+  }
   N.community.forEach(c=>{
     L.circleMarker([c.lat,c.lon],{radius:3+Math.sqrt(c.pop)/62,color:COL.community,weight:1,
       fill:true,fillColor:COL.community,fillOpacity:.5})
@@ -166,14 +255,14 @@
   });
   // schools
   N.hbcu.forEach(u=>{
-    L.circleMarker([u.lat,u.lon],{radius:5.5,color:'#fff',weight:1.5,fill:true,fillColor:COL.hbcu,fillOpacity:.95})
+    L.marker([u.lat,u.lon],{icon:glyphIcon('&#127891;',COL.hbcu,24)})
       .bindTooltip(u.name)
       .bindPopup(`<div style="max-width:240px"><b style="font-size:13px">${esc(u.name)}</b>
         <div style="color:var(--dim);font-size:11px;margin:1px 0 6px">HBCU · ${esc(u.city)}, ${esc(u.state)}</div>
         <div style="font-size:11.5px">${esc(u.prog)}</div></div>`).addTo(groups.hbcu);
   });
   N.elite.forEach(u=>{
-    L.circleMarker([u.lat,u.lon],{radius:5,color:'#fff',weight:1.5,fill:true,fillColor:COL.elite,fillOpacity:.95})
+    L.marker([u.lat,u.lon],{icon:glyphIcon('&#127891;',COL.elite,21)})
       .bindTooltip(u.name)
       .bindPopup(`<div><b style="font-size:13px">${esc(u.name)}</b>
         <div style="color:var(--dim);font-size:11px">Target recruiting · ${esc(u.city)}, ${esc(u.state)}</div></div>`).addTo(groups.elite);
@@ -197,7 +286,7 @@
   }
   const candMarkers={};
   N.candidate.forEach(c=>{
-    const m=L.circleMarker([c.lat,c.lon],{radius:9,color:'#fff',weight:2,fill:true,fillColor:COL.candidate,fillOpacity:.98})
+    const m=L.marker([c.lat,c.lon],{icon:glyphIcon('&#127963;',COL.candidate,30),zIndexOffset:1000})
       .bindTooltip(`${esc(c.label||c.name)}`)
       .bindPopup(candPopup(c),{maxWidth:300,maxHeight:Math.round(innerHeight*0.72),
         autoPanPaddingTopLeft:[24,96],autoPanPaddingBottomRight:[24,28]});
@@ -217,12 +306,55 @@
       <div style="color:${colors[p.s]};font-size:11px;margin:1px 0 5px">${esc(sources[p.s])} · ${p.f.length} fellow(s)</div>
       <div style="max-height:min(44vh,240px);overflow-y:auto;padding-right:4px">${rows}</div></div>`;
   }
+  const YEAR_MIN=1989, YEAR_MAX=2025;
+  const tourMarkers=[]; // {m, s, n, year} — one per fellowship placement dot, for the year-over-year tour
   (N.fellows||[]).forEach(p=>{ felCount[p.s]+=p.f.length;
-    L.circleMarker([p.lat,p.lon],{radius:felR(p.f.length),color:'#fff',weight:1,fill:true,fillColor:colors[p.s],fillOpacity:.82})
+    const m=L.circleMarker([p.lat,p.lon],{radius:felR(p.f.length),color:'#fff',weight:1,fill:true,fillColor:colors[p.s],fillOpacity:.82})
       .bindTooltip(`${p.label} · ${p.f.length} ${sources[p.s]}`)
       .bindPopup(felPopup(p),{maxWidth:300,maxHeight:Math.round(innerHeight*0.7),autoPanPaddingTopLeft:[24,96],autoPanPaddingBottomRight:[24,28]})
       .addTo(felGroups[p.s]);
+    const years=p.f.map(f=>f[2]).filter(Boolean);
+    tourMarkers.push({m, s:p.s, n:p.f.length, year: years.length?Math.min(...years):YEAR_MIN});
   });
+  const totalFellowsCount=tourMarkers.reduce((s,t)=>s+t.n,0);
+
+  // ---- deep south state borders (Alabama, Georgia, Louisiana, Mississippi, Tennessee, Texas), fetched once and cached ----
+  const SOUTH_STATES=['Alabama','Georgia','Louisiana','Mississippi','Tennessee','Texas'];
+  const SOUTH_FALLBACK_BOUNDS=[[25.6,-106.7],[37.1,-80.7]]; // rough box if the boundary fetch fails
+  let southGeo=null, southGeoPromise=null;
+  function loadSouthGeo(){
+    if(southGeoPromise) return southGeoPromise;
+    southGeoPromise=fetch('https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI/data/geojson/us-states.json')
+      .then(r=>r.json())
+      .then(gj=>{ southGeo={type:'FeatureCollection',features:gj.features.filter(f=>SOUTH_STATES.includes(f.properties.name))}; return southGeo; })
+      .catch(()=>{ southGeo=null; return null; });
+    return southGeoPromise;
+  }
+  function pointInRing(lat,lon,ring){
+    let inside=false;
+    for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+      const xi=ring[i][0], yi=ring[i][1], xj=ring[j][0], yj=ring[j][1];
+      if(((yi>lat)!==(yj>lat)) && (lon<(xj-xi)*(lat-yi)/(yj-yi)+xi)) inside=!inside;
+    }
+    return inside;
+  }
+  function pointInGeom(lat,lon,geom){
+    if(geom.type==='Polygon'){
+      if(!pointInRing(lat,lon,geom.coordinates[0])) return false;
+      for(let k=1;k<geom.coordinates.length;k++){ if(pointInRing(lat,lon,geom.coordinates[k])) return false; }
+      return true;
+    }
+    if(geom.type==='MultiPolygon') return geom.coordinates.some(poly=>pointInGeom(lat,lon,{type:'Polygon',coordinates:poly}));
+    return false;
+  }
+  function inSouthBox(lat,lon){
+    return lat>=SOUTH_FALLBACK_BOUNDS[0][0]&&lat<=SOUTH_FALLBACK_BOUNDS[1][0]&&lon>=SOUTH_FALLBACK_BOUNDS[0][1]&&lon<=SOUTH_FALLBACK_BOUNDS[1][1];
+  }
+  function pointInSouth(lat,lon){
+    if(southGeo) return southGeo.features.some(f=>pointInGeom(lat,lon,f.geometry));
+    return inSouthBox(lat,lon);
+  }
+  loadSouthGeo(); // kick off early so it's likely ready by the time the tour needs it
   (function(){const bm={}; sources.forEach((s,i)=>{(bm[model[s]]=bm[model[s]]||[]).push(i);});
     let h=''; for(const mod in bm){ h+=`<div class="legmod">${mod}</div>`;
       bm[mod].forEach(i=>{h+=`<label class="lyr"><input type="checkbox" checked data-fs="${i}"><span class="dot" style="background:${colors[i]}"></span><span class="nm">${esc(sources[i])}</span><span class="n">${felCount[i]}</span></label>`;});}
@@ -250,7 +382,10 @@
 
   // ---- mode switch ----
   const pipeKeys=['placements','arcs','community','hbcu','elite'];
-  ['placements','arcs','community','hbcu','elite','candidate'].forEach(k=>groups[k].addTo(map));
+  ['placements','arcs','community','hbcu','elite','candidate'].forEach(k=>{
+    const cb=document.querySelector(`#pipeBlock input[data-k="${k}"]`);
+    if(!cb||cb.checked) groups[k].addTo(map);
+  });
   document.querySelectorAll('#pipeBlock input[data-k]').forEach(inp=>inp.addEventListener('change',e=>{
     const k=e.target.dataset.k; e.target.checked?groups[k].addTo(map):map.removeLayer(groups[k]);}));
   function setMode(m){
@@ -283,9 +418,149 @@
     document.getElementById('tDark').classList.toggle('on',d);document.getElementById('tLight').classList.toggle('on',!d);}
   document.getElementById('tLight').addEventListener('click',()=>setTheme(false));
   document.getElementById('tDark').addEventListener('click',()=>setTheme(true));
+
+  const ctrlEl=document.getElementById('ctrl');
+  document.getElementById('ctrlToggle').addEventListener('click',()=>ctrlEl.classList.toggle('collapsed'));
+  if(matchMedia('(max-width:660px)').matches) ctrlEl.classList.add('collapsed');
   const qs=new URLSearchParams(location.search);
   if(qs.get('embed')==='1'||qs.get('title')==='0') document.body.classList.add('embed');
   if(qs.get('theme')==='dark') setTheme(true);
+
+  // ---- guided tour: existing fellowships, year by year -> the Southern gap -> walk through our pipeline ----
+  const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tourR=n=>Math.min(7,1.5+0.9*Math.sqrt(n)); // deliberately smaller than the interactive felR sizing
+  const tourFab=document.getElementById('tourFab'), tourBar=document.getElementById('tourBar'),
+    tourText=document.getElementById('tourText'), tourProg=document.getElementById('tourProg'),
+    tourYearEl=document.getElementById('tourYear'), tourNextBtn=document.getElementById('tourNext'),
+    tourCloseBtn=document.getElementById('tourClose'), tourLegendEl=document.getElementById('tourLegend');
+  let tourRunning=false, tourTimer=null, advanceResolve=null, southLayer=null;
+  const STEPS=6;
+
+  function delay(ms){
+    return new Promise(res=>{
+      const done=()=>{ if(tourTimer){clearTimeout(tourTimer); tourTimer=null;} advanceResolve=null; res(); };
+      advanceResolve=done;
+      tourTimer=setTimeout(done, ms);
+    });
+  }
+  function flyAndWait(bounds, opts){
+    if(REDUCE){ map.fitBounds(bounds,{padding:opts.padding}); return Promise.resolve(); }
+    return new Promise(res=>{ map.once('moveend', res); map.flyToBounds(bounds, opts); });
+  }
+  function setTourText(html, stepIdx){
+    tourText.innerHTML=html;
+    tourProg.innerHTML=Array.from({length:STEPS},(_,i)=>`<span class="${i===stepIdx?'on':''}"></span>`).join('');
+  }
+  function showTourLegend(){
+    tourLegendEl.innerHTML='<h4>Existing fellowship programs</h4>'+
+      sources.map((s,i)=>`<div class="leg"><span class="sw" style="background:${colors[i]}"></span>${esc(s)}</div>`).join('');
+    tourLegendEl.style.display='flex';
+  }
+  function hideTourLegend(){ tourLegendEl.style.display='none'; }
+  function resetTourMarkers(){
+    tourMarkers.forEach(t=>t.m.setStyle({fillOpacity:.82, fillColor:colors[t.s], radius:felR(t.n)}));
+  }
+  async function ensureSouthLayer(){
+    await loadSouthGeo();
+    return southGeo
+      ? L.geoJSON(southGeo,{style:{color:COL.candidate,weight:2,dashArray:'5 6',fill:true,fillColor:COL.candidate,fillOpacity:.05},interactive:false})
+      : L.rectangle(SOUTH_FALLBACK_BOUNDS,{color:COL.candidate,weight:2,dashArray:'5 6',fill:true,fillColor:COL.candidate,fillOpacity:.05,interactive:false});
+  }
+  function finishTour(){
+    tourRunning=false;
+    if(tourTimer){clearTimeout(tourTimer); tourTimer=null;}
+    advanceResolve=null;
+    document.body.classList.remove('touring');
+    tourBar.hidden=true;
+    tourYearEl.classList.remove('show');
+    hideTourLegend();
+    if(southLayer){map.removeLayer(southLayer); southLayer=null;}
+    felGroups.forEach(g=>map.removeLayer(g));
+    resetTourMarkers();
+    setMode('pipe');
+    map.flyToBounds([[25.5,-124],[48.5,-67]],{padding:[8,8],duration:1.2});
+  }
+
+  async function runTour(){
+    if(tourRunning) return;
+    tourRunning=true;
+    document.body.classList.add('touring');
+    tourBar.hidden=false;
+
+    pipeKeys.forEach(k=>map.removeLayer(groups[k]));
+    map.removeLayer(groups.candidate);
+    felGroups.forEach(g=>map.removeLayer(g));
+    tourMarkers.forEach(t=>t.m.setStyle({fillOpacity:0, radius:1}));
+    map.flyToBounds([[24,-125],[49,-66]],{duration:1.1});
+    setTourText(`<b>This is where America's civic-fellowship talent has gone.</b> Six national programs, watched year by year.`,0);
+    showTourLegend();
+    felGroups.forEach(g=>g.addTo(map));
+    await delay(REDUCE?200:1500);
+    if(!tourRunning) return;
+
+    if(REDUCE){
+      tourMarkers.forEach(t=>t.m.setStyle({fillOpacity:.85, radius:tourR(t.n)}));
+    }else{
+      tourYearEl.classList.add('show');
+      for(let y=YEAR_MIN;y<=YEAR_MAX;y++){
+        if(!tourRunning) return;
+        tourYearEl.textContent=y;
+        tourMarkers.filter(t=>t.year===y).forEach(t=>t.m.setStyle({fillOpacity:.85, radius:tourR(t.n)}));
+        await delay(y<2010?75:(y<2018?130:220));
+      }
+      tourYearEl.classList.remove('show');
+    }
+    if(!tourRunning) return;
+
+    setTourText(`<b>${totalFellowsCount.toLocaleString()} placements</b> across ${sources.length} national programs, three decades of investment in local government talent.`,0);
+    await delay(REDUCE?300:2800);
+    if(!tourRunning) return;
+
+    // ---- the Southern gap: fly and settle first, then draw the state borders (avoids the flight-vs-redraw jank) ----
+    southLayer=await ensureSouthLayer();
+    if(!tourRunning) return;
+    const southBounds=southLayer.getBounds();
+    await flyAndWait(southBounds,{padding:[40,40],duration:1.6});
+    if(!tourRunning) return;
+    southLayer.addTo(map);
+    const southCount=(N.fellows||[]).reduce((s,p)=>s+(pointInSouth(p.lat,p.lon)?p.f.length:0),0);
+    const southPct=Math.max(1, Math.round(100*southCount/totalFellowsCount));
+    setTourText(`<b>Only ${southPct}% of them ever reach Alabama, Georgia, Louisiana, Mississippi, Tennessee, or Texas</b> — look how little of that talent has touched the Deep South.`,1);
+    await delay(REDUCE?300:3400);
+    if(!tourRunning) return;
+
+    // ---- the five jurisdictions ----
+    hideTourLegend();
+    tourMarkers.forEach(t=>t.m.setStyle({fillColor:COL.field, fillOpacity:.3}));
+    groups.candidate.addTo(map);
+    setTourText(`<b>These are the five jurisdictions we're focused on:</b> Prichard, Jefferson County, Jackson, Mason, and Stonecrest.`,2);
+    await delay(REDUCE?300:3200);
+    if(!tourRunning) return;
+
+    // ---- recruiting from local HBCUs ----
+    groups.hbcu.addTo(map);
+    setTourText(`<b>We recruit directly from the region's HBCU network</b> — the technical talent already rooted in the South.`,3);
+    await delay(REDUCE?300:3000);
+    if(!tourRunning) return;
+
+    // ---- the broader top-school network ----
+    groups.elite.addTo(map);
+    setTourText(`<b>...and from the country's top technical schools</b>, broadening the pipeline beyond the region alone.`,4);
+    await delay(REDUCE?300:3000);
+    if(!tourRunning) return;
+
+    // ---- draw the recruiting lines ----
+    groups.arcs.addTo(map);
+    setTourText(`<b>Here's how it connects.</b> Recruiting pipelines flowing directly into the five communities that need them most — that's the gap Civic Tech Corps is built to close.`,5);
+    await delay(REDUCE?300:4200);
+    if(!tourRunning) return;
+
+    finishTour();
+  }
+
+  tourFab.addEventListener('click',runTour);
+  tourCloseBtn.addEventListener('click',finishTour);
+  tourNextBtn.addEventListener('click',()=>{ if(advanceResolve) advanceResolve(); });
 })();
 </script>
 </body>
